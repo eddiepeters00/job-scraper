@@ -2,6 +2,7 @@
 
 import { Job } from "@/app/types/types";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 type ListProps = {
   jobs: Job[];
@@ -26,7 +27,9 @@ export default function List({ jobs }: ListProps) {
             </span>
             <span className="flex-1">{job.location}</span>
             <span className="flex-none">
-              <ArrowRight />
+              <Link href={job.url}>
+                <ArrowRight />
+              </Link>
             </span>
           </li>
         ))}

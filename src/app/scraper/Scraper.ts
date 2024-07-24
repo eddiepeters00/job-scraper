@@ -1,61 +1,36 @@
-import puppeteer, { Browser } from "puppeteer";
+import puppeteer, { Browser, EvaluateFunc } from "puppeteer";
 import { promises as fs } from "fs";
+import { Job } from "../types/types";
 
 export default async function Scraper({
   url,
-  listAttribute,
-  titleAttribute,
-  locationAttribute,
+  evaluateFunction,
 }: {
   url: string;
-  listAttribute: string;
-  titleAttribute: string;
-  locationAttribute: string;
+  evaluateFunction: EvaluateFunc<[]>;
 }) {
   const browser: Browser = await puppeteer.launch();
+  try {
+    const page = await browser.newPage();
+    await page.goto(url);
+    const data = await page.evaluate(evaluateFunction);
+    await browser.close();
+    await saveData(data);
+    return data;
+  } catch (error) {
+    console.error("Error during scraping");
+    throw error;
+  }
+}
 
-  const page = await browser.newPage();
-  await page.goto(url);
-
-  const data = await page.evaluate(
-    (
-      url: string,
-      listAttribute: string,
-      titleAttribute: string,
-      locationAttribute: string
-    ) => {
-      const jobs = Array.from(document.querySelectorAll(listAttribute));
-      return jobs.map((job: Element) => {
-        //Get job title
-        const titleElement = job.querySelector(titleAttribute)?.innerHTML;
-
-        //Get jobURL
-        const jobUrl = job.getAttribute("data-job-url") || "No URL found";
-
-        //Get location
-        const jobLocation = job.querySelector(locationAttribute)?.innerHTML;
-        return {
-          id: "testID123",
-          url: jobUrl ? jobUrl.trim() : "Nu URL found",
-          title: titleElement ? titleElement.trim() : "No title found",
-          location: jobLocation ? jobLocation.trim() : "Unknown",
-        };
-      });
-    },
-    url,
-    listAttribute,
-    titleAttribute,
-    locationAttribute
-  );
-
-  await browser.close();
-
+const saveData = async (data: Awaited<ReturnType<EvaluateFunc<[]>>>) => {
   //Delete old data.json
   try {
     await fs.unlink("data.json");
     console.log("Successfully deleted data.json");
   } catch (error) {
-    console.error(error);
+    console.error("Could not delete data.json");
+    throw error;
   }
 
   //Write data to data.json
@@ -63,8 +38,7 @@ export default async function Scraper({
     await fs.writeFile("data.json", JSON.stringify(data, null, 2));
     console.log("Successfully saved data to JSON");
   } catch (error) {
-    console.error(error);
+    console.error("Could not save scraped data");
+    throw error;
   }
-
-  return data;
-}
+};

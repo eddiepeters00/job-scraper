@@ -1,15 +1,29 @@
 import List from "./components/jobs/List";
 import Scraper from "./scraper/Scraper";
-import { Job } from "./types/types";
 
 export default async function Home() {
+  const fridayEvaluationFunction = () => {
+    const jobs = Array.from(document.querySelectorAll(".job-item-grid"));
+    return jobs.map((job: Element) => {
+      const titleElement = job.querySelector(".job-title-text")?.textContent;
+      const jobUrl = job.getAttribute("data-job-url") || "No URL found";
+      const jobLocation = job.querySelector(".job-location")?.textContent;
+      return {
+        id: job.getAttribute("data-id") || "No ID found",
+        url: jobUrl ? jobUrl.trim() : "No URL found",
+        title: titleElement ? titleElement.trim() : "No title found",
+        location: jobLocation ? jobLocation.trim() : "Unknown",
+      };
+    });
+  };
+
   //Scrape data from Friday.se
-  const data: Job[] = await Scraper({
+  const data = await Scraper({
     url: "https://friday.se/lediga-jobb/",
-    listAttribute: ".job-item-grid",
-    titleAttribute: ".job-title-text",
-    locationAttribute: ".job-location",
+    evaluateFunction: fridayEvaluationFunction,
   });
+
+  console.log(data);
 
   return (
     <main className="">
