@@ -1,6 +1,5 @@
 import puppeteer, { Browser, EvaluateFunc } from "puppeteer";
 import { promises as fs } from "fs";
-import { Job } from "../types/types";
 
 export default async function Scraper({
   url,
@@ -8,7 +7,7 @@ export default async function Scraper({
 }: {
   url: string;
   evaluateFunction: EvaluateFunc<[]>;
-}) {
+}): Promise<[]> {
   const browser: Browser = await puppeteer.launch();
   try {
     const page = await browser.newPage();
@@ -16,7 +15,7 @@ export default async function Scraper({
     const data = await page.evaluate(evaluateFunction);
     await browser.close();
     await saveData(data);
-    return data;
+    return data as [];
   } catch (error) {
     console.error("Error during scraping");
     throw error;

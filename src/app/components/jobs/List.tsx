@@ -9,6 +9,7 @@ type ListProps = {
 };
 
 export default function List({ jobs }: ListProps) {
+  console.log("jobs in component List", jobs);
   return (
     <section className="grid place-content-center">
       <div className="p-2 m-4 flex underline">
@@ -17,7 +18,7 @@ export default function List({ jobs }: ListProps) {
         <span className="flex-none font-bold">Link</span>
       </div>
       <ul>
-        {jobs.map((job) => (
+        {jobs.flatMap((job) => (
           <li
             className="p-2 m-4 flex items-center justify-center border border-gray-300 bg-gray-100"
             key={job.id}

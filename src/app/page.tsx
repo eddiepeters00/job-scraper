@@ -1,7 +1,10 @@
 import List from "./components/jobs/List";
 import Scraper from "./scraper/Scraper";
+import { Job } from "./types/types";
 
 export default async function Home() {
+  const listOfJobs: Job[] = [];
+
   //Evaluation logic for Friday.se
   const fridayEvaluationFunction = () => {
     const jobs = Array.from(document.querySelectorAll(".job-item-grid"));
@@ -24,8 +27,6 @@ export default async function Home() {
     evaluateFunction: fridayEvaluationFunction,
   });
 
-  //Student Consulting
-
   //Evaluation logic for studentconsulting.se
   const studentConsultingEvaluationFunction = () => {
     const jobCards = Array.from(document.querySelectorAll(".o-job-card"));
@@ -36,7 +37,6 @@ export default async function Home() {
       const jobLocation = jobCard.querySelector(".o-job-card__tag--sub-value")
         ?.innerHTML;
 
-      // Since the published date is in the same element as city
       const publishedDateElement = jobCard.querySelector(
         ".o-job-card__tag--sub-value.o-job-card__tag--sub-value--right"
       )?.textContent;
@@ -60,13 +60,13 @@ export default async function Home() {
     evaluateFunction: studentConsultingEvaluationFunction,
   });
 
-  console.log("DATA FROM FRIDAY: ", fridayData);
-  console.log("DATA FROM SC: ", studentConsultingData);
+  listOfJobs.push(...fridayData, ...studentConsultingData);
 
+  console.log("List of jobs: ", listOfJobs);
   return (
     <main className="">
       <div className="mt-10">
-        <List jobs={fridayData} />
+        <List jobs={listOfJobs} />
       </div>
     </main>
   );
