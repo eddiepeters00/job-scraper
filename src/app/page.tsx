@@ -62,9 +62,8 @@ export default async function Home() {
 
   listOfJobs.push(...fridayData, ...studentConsultingData);
 
-  console.log("List of jobs: ", listOfJobs);
   return (
-    <main className="">
+    <main className="min-h-dvh">
       <div className="mt-10">
         <List jobs={listOfJobs} />
       </div>
